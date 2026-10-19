@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Order;
 use App\Models\Product;
+use Database\Seeders\ProductCategorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -110,5 +111,19 @@ class CartCheckoutTest extends TestCase
 
         $this->assertDatabaseCount('orders', 0);
         $this->assertDatabaseHas('products', ['id' => $product->id, 'stock' => 1]);
+    }
+
+    public function test_product_category_seeder_is_repeatable_and_links_products_to_categories(): void
+    {
+        $this->seed(ProductCategorySeeder::class);
+        $product = Product::query()->where('slug', 'headphone-nirkabel')->firstOrFail();
+        $product->decrement('stock');
+
+        $this->seed(ProductCategorySeeder::class);
+
+        $this->assertDatabaseCount('categories', 4);
+        $this->assertDatabaseCount('products', 8);
+        $this->assertSame(17, $product->fresh()->stock);
+        $this->assertNotNull($product->fresh()->categoryRelation);
     }
 }
