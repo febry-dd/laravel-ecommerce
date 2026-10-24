@@ -15,7 +15,10 @@ class EnsureAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        abort_unless($request->user()?->is_admin, 403);
+        if (! $request->user()?->is_admin) {
+            return redirect()->route('home')
+                ->with('error', 'You do not have permission to access this page.');
+        }
 
         return $next($request);
     }

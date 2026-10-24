@@ -52,7 +52,16 @@ class AuthAdminTest extends TestCase
 
         $this->actingAs($customer)
             ->get(route('admin.dashboard'))
-            ->assertForbidden();
+            ->assertRedirect(route('home'))
+            ->assertSessionHas('error', 'You do not have permission to access this page.');
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('<dialog id="access-denied-dialog"', false)
+            ->assertSee('Access restricted')
+            ->assertSee('You do not have permission to access this page.')
+            ->assertSee('Okay, got it')
+            ->assertSee("getElementById('access-denied-dialog').showModal()", false);
     }
 
     public function test_customer_cannot_view_another_customers_order(): void

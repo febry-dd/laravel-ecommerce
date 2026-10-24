@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f5f7f3">
+    <meta name="theme-color" content="#f4f7fb">
     <title>{{ $title ?? config('app.name') }} · {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -51,5 +51,23 @@
             <a href="{{ route('products.index') }}">Jelajahi produk</a>
         </div>
     </footer>
+    @if (session('error'))
+        <dialog id="access-denied-dialog" class="access-denied-dialog" aria-labelledby="access-denied-title" aria-describedby="access-denied-message">
+            <div class="access-denied-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3 20 6v5c0 5.1-3.4 8.6-8 10-4.6-1.4-8-4.9-8-10V6l8-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M12 8v4m0 3h.01" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h2 id="access-denied-title">Access restricted</h2>
+            <p id="access-denied-message">{{ session('error') }}</p>
+            <form method="dialog">
+                <button class="access-denied-confirm" type="submit" autofocus>Okay, got it</button>
+            </form>
+        </dialog>
+        <script>
+            document.getElementById('access-denied-dialog').showModal();
+        </script>
+    @endif
 </body>
 </html>
