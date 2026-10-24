@@ -29,6 +29,23 @@ class AuthAdminTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_guest_authentication_pages_render_the_site_brand(): void
+    {
+        config(['app.name' => 'Luma Market']);
+
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('Luma Market')
+            ->assertSee('brand-mark')
+            ->assertSee('Masuk ke akunmu');
+
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee('Luma Market')
+            ->assertSee('brand-mark')
+            ->assertSee('Buat akun');
+    }
+
     public function test_customer_cannot_access_admin_routes(): void
     {
         $customer = User::factory()->create();

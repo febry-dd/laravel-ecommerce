@@ -84,6 +84,7 @@ button { cursor: pointer; }
     font-size: 15px;
     font-weight: 800;
 }
+.brand-mark svg { width: 19px; height: 19px; }
 .main-nav { display: flex; align-items: center; gap: 26px; }
 .main-nav a { color: #525d56; font-size: 14px; font-weight: 600; }
 .main-nav a:hover, .main-nav a[aria-current="page"] { color: var(--pine); }
