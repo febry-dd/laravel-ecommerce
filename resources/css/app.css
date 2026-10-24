@@ -260,6 +260,8 @@ input[type="file"] { width: 100%; padding: 10px; border: 1px dashed #b8c7bc; bac
 .data-table tr:last-child td { border-bottom: 0; }
 .data-table-actions { display: flex; align-items: center; gap: 8px; }
 .data-table-actions form { margin: 0; }
+.admin-product-thumb { width: 64px; height: 54px; object-fit: cover; background: #e9efe8; }
+.admin-header .main-nav a[aria-current="page"] { color: var(--lime); }
 .status-pill { display: inline-flex; align-items: center; padding: 4px 9px; background: #edf4e4; color: #526b2b; font-size: 11px; font-weight: 700; text-transform: capitalize; }
 .status-pill.is-pending { background: #fff2d9; color: #8b6420; }
 .status-pill.is-cancelled, .status-pill.is-failed { background: #fbe9e5; color: #9a4b3e; }

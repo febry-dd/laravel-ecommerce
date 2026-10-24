@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class ProductController extends Controller
      */
     public function index(): View
     {
-        $products = Product::latest()->paginate(20);
+        $products = Product::with('categoryRelation')->latest()->paginate(20);
 
         return view('admin.products.index', compact('products'));
     }
@@ -27,7 +28,9 @@ class ProductController extends Controller
      */
     public function create(): View
     {
-        return view('admin.products.create');
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.products.create', compact('categories'));
     }
 
     /**
@@ -39,10 +42,12 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'category' => ['nullable', 'string', 'max:100'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'price' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
             'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+        $validated = $this->synchronizeCategoryLabel($validated);
         $validated['slug'] = Str::slug($validated['name']).'-'.Str::lower(Str::random(6));
 
         if ($request->hasFile('image')) {
@@ -59,7 +64,9 @@ class ProductController extends Controller
      */
     public function show(Product $product): View
     {
-        return view('admin.products.edit', compact('product'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -67,7 +74,9 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
-        return view('admin.products.edit', compact('product'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -79,10 +88,12 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'category' => ['nullable', 'string', 'max:100'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'price' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
             'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+        $validated = $this->synchronizeCategoryLabel($validated);
         $validated['slug'] = Str::slug($validated['name']).'-'.$product->id;
 
         if ($request->hasFile('image')) {
@@ -110,5 +121,22 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');
+    }
+
+    /**
+     * Keep the legacy category label in sync while accepting older form submissions.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function synchronizeCategoryLabel(array $validated): array
+    {
+        if (array_key_exists('category_id', $validated)) {
+            $validated['category'] = isset($validated['category_id'])
+                ? Category::query()->findOrFail($validated['category_id'])->name
+                : null;
+        }
+
+        return $validated;
     }
 }
